@@ -9,7 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: 수집 실행
-        run: python3 scripts/collect_speeches.py --daesu 13 --out data/speeches.json
+        run: python3 scripts/collect_speeches.py --daesu 13 --th 453 --out data/speeches.json
       - name: 변경분 커밋
         run: |
           git config user.name "github-actions[bot]"
