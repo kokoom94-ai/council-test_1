@@ -1,19 +1,23 @@
-name: 회의록 수집
-on:
-  workflow_dispatch:
-permissions:
-  contents: write
-jobs:
-  collect:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - name: 수집 실행
-        run: python3 scripts/collect_speeches.py --daesu 13 --th 453 --out data/speeches.json
-      - name: 변경분 커밋
+- name: 진단
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/speeches.json
-          git diff --staged --quiet || git commit -m "회의록 수집"
-          git push
+          python3 - <<'PY'
+          import urllib.request, re
+          UA={"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"}
+          def get(u):
+              r=urllib.request.Request(u,headers=UA)
+              with urllib.request.urlopen(r,timeout=40) as f: return f.read()
+          tests={
+            "회기목록": "https://record.council.jeju.kr/source/minutes/pages/period.html?daesu=13&th=453&fchk=A&tag=lth",
+            "차수목록": "https://record.council.jeju.kr/source/minutes/pages/period.html?daesu=13&th=453&fcode=A011&cha=1&fchk=A&tag=langun",
+            "본문":     "https://record.council.jeju.kr/CLRecords/Retrieval2/index.php?hfile=13A0110453011.html&daesu=13",
+          }
+          for name,u in tests.items():
+              try:
+                  raw=get(u); h=raw.decode("euc-kr","replace")
+                  print(f"\n[{name}] {len(raw)} bytes")
+                  print("  hfile 링크:", len(set(re.findall(r'hfile=([0-9A-Za-z]+\.html)',h))))
+                  print("  f_code 링크:", len(set(re.findall(r'f_code=(\d+)',h))))
+                  print("  앞부분:", h[:300].replace("\n"," ")[:300])
+              except Exception as e:
+                  print(f"\n[{name}] 실패: {e}")
+          PY
