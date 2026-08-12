@@ -1,0 +1,12 @@
+name: council-test
+on: workflow_dispatch
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: robots
+        run: curl -s https://www.council.jeju.kr/robots.txt || echo "robots 실패"
+      - name: search
+        run: |
+          curl -sI -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/126.0 Safari/537.36" \
+          "https://www.council.jeju.kr/help/search.do?word=%ED%95%9C%EA%B6%8C" | head -3
