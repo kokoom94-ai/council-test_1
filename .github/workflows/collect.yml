@@ -7,7 +7,7 @@ jobs:
   collect:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: 수집 실행
         run: python3 scripts/collect_speeches.py --daesu 13 --th 453 --out data/speeches.json
       - name: 변경분 커밋
